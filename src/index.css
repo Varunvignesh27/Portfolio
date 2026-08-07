@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@100..800&family=Space+Grotesk:wght@300..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-stone-900: #2C3E50;
+  --color-stone-500: #7F8C8D;
+  --color-emerald-500: #34495E;
+  
+  --font-sans: 'Sora', sans-serif;
+  --font-heading: 'Space Grotesk', sans-serif;
+  
+  --animate-marquee: marquee 180s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 180s linear infinite;
+  
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes marquee-reverse {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+}
+
+@utility pause {
+  animation-play-state: paused;
+}
+
+:root {
+  font-family: 'Sora', sans-serif;
+  background-color: #ECF0F1;
+  color: #2C3E50;
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: var(--font-sans) !important;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading) !important;
+  }
+}
+
+/* Custom Selection */
+::selection {
+  background-color: #34495E;
+  color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ECF0F1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
+
