@@ -5,31 +5,48 @@ import { projects } from '../data/projects';
 
 const Projects = () => {
   const scrollRef = useRef(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const exactScroll = useRef(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const timeoutRef = useRef(null);
 
   useEffect(() => {
-    if (isHovered) return;
+    if (isPaused) return;
 
     const intervalId = setInterval(() => {
       if (scrollRef.current) {
-        scrollRef.current.scrollLeft += 1;
-        
-        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        // When we reach the end, jump back to the start
-        if (Math.ceil(scrollLeft + clientWidth) >= scrollWidth) {
-          scrollRef.current.scrollLeft = 0;
+        // Sync exactScroll with native manual scroll if user swiped
+        if (Math.abs(scrollRef.current.scrollLeft - exactScroll.current) > 2) {
+          exactScroll.current = scrollRef.current.scrollLeft;
         }
+
+        exactScroll.current += speed;
+        
+        const { scrollWidth, clientWidth } = scrollRef.current;
+        // When we reach the end, jump back to the start
+        if (Math.ceil(exactScroll.current + clientWidth) >= scrollWidth) {
+          exactScroll.current = 0;
+        }
+        scrollRef.current.scrollLeft = exactScroll.current;
       }
     }, 15); // Consistent speed across all refresh rates
 
     return () => clearInterval(intervalId);
-  }, [isHovered]);
+  }, [isPaused, speed]);
 
   const manualScroll = (direction) => {
     if (scrollRef.current) {
+      setIsPaused(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
       const { scrollLeft, clientWidth } = scrollRef.current;
       const scrollTo = direction === 'left' ? scrollLeft - clientWidth / 1.5 : scrollLeft + clientWidth / 1.5;
       scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+
+      // Resume auto-scroll after the smooth animation finishes
+      timeoutRef.current = setTimeout(() => {
+        setIsPaused(false);
+      }, 800);
     }
   };
 
@@ -50,16 +67,12 @@ const Projects = () => {
         <div className="hidden md:flex gap-4">
           <button 
             onClick={() => manualScroll('left')}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
             className="p-3 rounded-full bg-stone-100 text-[#2C3E50] hover:bg-[#34495E] hover:text-white transition-all shadow-sm"
           >
             <LuChevronLeft size={24} />
           </button>
           <button 
             onClick={() => manualScroll('right')}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
             className="p-3 rounded-full bg-stone-100 text-[#2C3E50] hover:bg-[#34495E] hover:text-white transition-all shadow-sm"
           >
             <LuChevronRight size={24} />
@@ -72,13 +85,12 @@ const Projects = () => {
         <div className="absolute left-0 top-0 bottom-0 w-8 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
         <div className="absolute right-0 top-0 bottom-0 w-8 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-        {/* Scroll Container */}
         <div 
           ref={scrollRef}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onTouchStart={() => setIsHovered(true)}
-          onTouchEnd={() => setIsHovered(false)}
+          onMouseEnter={() => setSpeed(0.2)}
+          onMouseLeave={() => setSpeed(1)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
           className="flex gap-8 px-8 md:px-32 overflow-x-auto pb-8 hide-scrollbar [&::-webkit-scrollbar]:hidden"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
