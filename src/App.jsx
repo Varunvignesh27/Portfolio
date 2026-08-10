@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 import Header from './components/Header';
 import About from './components/About';
 import Skills from './components/Skills';
@@ -32,6 +33,8 @@ function App() {
           <Footer />
         </motion.div>
       )}
+      
+      <Analytics />
     </>
   );
 }
